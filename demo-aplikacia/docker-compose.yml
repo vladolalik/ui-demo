@@ -1,0 +1,47 @@
+version: '3.7'
+
+services:    
+    mvsr-ui:     
+      container_name: mvsr-ui
+      logging:        
+        driver: "json-file"
+        options:
+          max-size: "50m"
+          max-file: "4"
+      image: ibm/mvsr-ui
+      networks:
+        - net-mvsr
+      environment:
+        SPRING_API_URL: "http://192.168.2.49:9080"
+      command:
+         - /app/entrypoint.sh
+      volumes:
+         - ./ui-config/entrypoint.sh:/app/entrypoint.sh  
+      ports:              
+        - 80:80 
+    mvsr-demo-spring:
+      container_name: mvsr-demo-spring
+      image: ibm/mvsr-demo-spring
+      networks:
+        - net-mvsr
+      logging:
+        # limit logs to 200MB (4rotations of 50M each)
+        driver: "json-file"
+        options:
+          max-size: "50m"
+          max-file: "4"
+      restart: always
+      ports:
+        - 9080:9080
+        - 9443:9443
+      # environment:        
+      #   SPRING_DATASOURCE_URL: 'jdbc:postgresql://192.168.2.49:5432/mvsr-db'       
+    # mvsr-postgres:
+    #   container_name: mvsr-postgres
+    #   image: ibm/mvsr-postgres
+    #   ports:
+    #     - 5432:5432
+networks:
+  net-mvsr:
+    driver: bridge
+
